@@ -13,14 +13,19 @@ public class Tennis extends Applet implements Runnable, KeyListener {
 	Thread thread;
 	//Criando Jogadores
 	HumanPaddle p1;
+	//Criando IA para ele não deixar a bola escapar para o outro lado
+	IAPaddle p2;
 	//Criando a Bola
 	Ball b1;
+	boolean comecarJogo;
 	
 	public void init() {
 		this.resize(WIDTH, HEIGHT);
+		comecarJogo = false;
 		this.addKeyListener(this);
 		p1 = new HumanPaddle(1);
 		b1 = new Ball();
+		p2 = new IAPaddle(2, b1);
 		thread = new Thread(this);
 		thread.start();
 
@@ -34,7 +39,13 @@ public class Tennis extends Applet implements Runnable, KeyListener {
 			g.drawString("Perdeu ", 350, 250);
 		}else{
 			p1.draw(g);
-			b1.draw(g);	
+			b1.draw(g);
+			p2.draw(g);
+		}
+		if(!comecarJogo){
+			g.setColor(Color.white);
+			g.drawString("TENNIS", 320, 100);
+			g.drawString("Presione ENTER para começar", 260, 130);
 		}
 		
 	}
@@ -46,9 +57,13 @@ public class Tennis extends Applet implements Runnable, KeyListener {
 	public void run() {
 		// TODO Auto-generated method stub
 		for (;;) {
-			p1.move();
-			b1.move();
-			b1.checkPaddleCollision(p1, p1);
+			if(comecarJogo){
+				p1.move();
+				p2.move();
+				b1.move();
+				b1.checkPaddleCollision(p1, p2);
+			}
+			
 			repaint();
 			try {
 				Thread.sleep(10);
@@ -66,6 +81,8 @@ public class Tennis extends Applet implements Runnable, KeyListener {
 			p1.setUpAccel(true);
 		} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 			p1.setDownAccel(true);
+		}else if(e.getKeyCode() == KeyEvent.VK_ENTER){
+			comecarJogo = true;
 		}
 	}
 
